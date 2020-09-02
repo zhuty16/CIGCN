@@ -1,1 +1,1 @@
-# RGNN
+# Orthogonal Graph Convolutional Network (OGCN)
