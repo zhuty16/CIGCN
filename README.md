@@ -1,1 +1,1 @@
-# Orthogonal Graph Convolutional Network (OGCN)
+# Channel-independent Graph Convolutional Network (OGCN)
