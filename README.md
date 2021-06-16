@@ -7,6 +7,8 @@ This is our Tensorflow implementation for the paper:
 ## Introduction
 Channel-Independent Graph Convolutional Network (CIGCN) is a graph convolution-based recommendation framework that adopts diagonal filter matrices for learning disentangled user and item embeddings.
 
+![](https://github.com/zhuty16/CIGCN/blob/master/framework.jpg)
+
 ## Citation
 ```
 @article{zhu2021embedding,
