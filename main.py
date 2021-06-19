@@ -13,7 +13,7 @@ parser.add_argument('--dataset', type=str, default='Automotive')
 parser.add_argument('--model', type=str, default='CIGCN') # {CIGCN, LR-GCCF, NGCF, LightGCN}
 parser.add_argument('--num_factor', type=int, default=64)
 parser.add_argument('--lr', type=float, default=1e-3)
-parser.add_argument('--l2_reg', type=float, default=1e-6)
+parser.add_argument('--l2_reg', type=float, default=1e-5)
 parser.add_argument('--num_layer', type=int, default=3)
 parser.add_argument('--batch_size', type=int, default=2048)
 parser.add_argument('--num_epoch', type=int, default=200)
@@ -53,7 +53,7 @@ with tf.Graph().as_default(), tf.Session(config=tf.ConfigProto(gpu_options=gpu_o
         train_data = get_train_data(train_dict, num_item)
         train_batch = get_train_batch(train_data, args.batch_size)
         for batch in train_batch:
-            loss, _ = sess.run([model.loss, model.train_op], feed_dict=get_feed_dict(model, batch, adj_matrix, args))
+            loss, _ = sess.run([model.loss, model.train_op], feed_dict=get_feed_dict(model, batch, adj_matrix, args.emb_dropout_rate, args.node_dropout_rate))
             train_loss.append(loss)
         train_loss = np.mean(train_loss)
         print("epoch: %d, %.2fs" % (epoch, time.time() - t1))
@@ -62,22 +62,14 @@ with tf.Graph().as_default(), tf.Session(config=tf.ConfigProto(gpu_options=gpu_o
         batch_size_test = 1000
         rank_list = list()
         for start in range(0, num_user, batch_size_test):
-            r_hat = sess.run(model.test_logits, feed_dict={model.u: validate_data[start:start+batch_size_test, 0],
-                                                           model.test_item: validate_data[start:start+batch_size_test, 1:],
-                                                           model.adj_matrix: adj_matrix,
-                                                           model.node_dropout_rate: 0.0,
-                                                           model.emb_dropout_rate: 0.0})
-            rank_list.extend(np.reshape(r_hat, [-1, 1000]).argsort()[:, ::-1].tolist())
+            r_hat = sess.run(model.test_logits, feed_dict=get_feed_dict_test(model, validate_data[start:start+batch_size_test], adj_matrix))
+            rank_list += np.reshape(r_hat, [-1, 1000]).argsort()[:, ::-1].tolist()
         metric_validate_10 = evaluate(rank_list, 0, 10)
 
     print("Model testing...")
     batch_size_test = 1000
     rank_list = list()
     for start in range(0, num_user, batch_size_test):
-        r_hat = sess.run(model.test_logits, feed_dict={model.u: test_data[start:start+batch_size_test, 0],
-                                                       model.test_item: test_data[start:start+batch_size_test, 1:],
-                                                       model.adj_matrix: adj_matrix_test,
-                                                       model.node_dropout_rate: 0.0,
-                                                       model.emb_dropout_rate: 0.0})
-        rank_list.extend(np.reshape(r_hat, [-1, 1000]).argsort()[:, ::-1].tolist())
+        r_hat = sess.run(model.test_logits, feed_dict=get_feed_dict_test(model, test_data[start:start+batch_size_test], adj_matrix_test))
+        rank_list += np.reshape(r_hat, [-1, 1000]).argsort()[:, ::-1].tolist()
     metric_test_10 = evaluate(rank_list, 0, 10)

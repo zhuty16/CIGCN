@@ -44,12 +44,22 @@ def get_test_data(test_dict, negative_dict):
     return np.asarray(test_data)
 
 
-def get_feed_dict(model, batch_data, adj_matrix, args):
+def get_feed_dict(model, batch_data, adj_matrix, emb_dropout_rate, node_dropout_rate):
     feed_dict = dict()
     feed_dict[model.u] = batch_data[:, 0]
     feed_dict[model.i] = batch_data[:, 1]
     feed_dict[model.j] = batch_data[:, 2]
     feed_dict[model.adj_matrix] = adj_matrix
-    feed_dict[model.node_dropout_rate] = args.node_dropout_rate
-    feed_dict[model.emb_dropout_rate] = args.emb_dropout_rate
+    feed_dict[model.emb_dropout_rate] = emb_dropout_rate
+    feed_dict[model.node_dropout_rate] = node_dropout_rate
+    return feed_dict
+
+
+def get_feed_dict_test(model, batch_data_test, adj_matrix_test):
+    feed_dict = dict()
+    feed_dict[model.u] = batch_data_test[:, 0]
+    feed_dict[model.test_item] = batch_data_test[:, 1:]
+    feed_dict[model.adj_matrix] = adj_matrix_test
+    feed_dict[model.emb_dropout_rate] = 0.0
+    feed_dict[model.node_dropout_rate] = 0.0
     return feed_dict
