@@ -16,17 +16,17 @@ class CIGCN(object):
         self.l2_reg = args.l2_reg
         self.lr = args.lr
 
-        self.adj_matrix = tf.sparse_placeholder(tf.float32, name="adj_matrix")
-        self.u = tf.placeholder(tf.int32, [None], name="uid")
-        self.i = tf.placeholder(tf.int32, [None], name="iid")
-        self.j = tf.placeholder(tf.int32, [None], name="jid")
-        self.node_dropout_rate = tf.placeholder(tf.float32, name="node_dropout_rate")
-        self.emb_dropout_rate = tf.placeholder(tf.float32, name="emb_dropout_rate")
+        self.adj_matrix = tf.sparse_placeholder(tf.float32, name='adj_matrix')
+        self.u = tf.placeholder(tf.int32, [None], name='uid')
+        self.i = tf.placeholder(tf.int32, [None], name='iid')
+        self.j = tf.placeholder(tf.int32, [None], name='jid')
+        self.node_dropout_rate = tf.placeholder(tf.float32, name='node_dropout_rate')
+        self.emb_dropout_rate = tf.placeholder(tf.float32, name='emb_dropout_rate')
 
         adj_matrix_dropout = self.node_dropout(self.adj_matrix, tf.shape(self.adj_matrix.values)[0], 1-self.node_dropout_rate)
 
         with tf.name_scope('embedding_table'):
-            embedding = tf.Variable(tf.random_normal([self.num_user + self.num_item, self.num_factor], stddev=0.01, name="embedding"))
+            embedding = tf.Variable(tf.random_normal([self.num_user + self.num_item, self.num_factor], stddev=0.01, name='embedding'))
 
         with tf.name_scope('graph_convolution'):
             embedding_final = [embedding]
@@ -35,7 +35,7 @@ class CIGCN(object):
             if args.model == 'CIGCN':
                 W = []
                 for k in range(self.num_layer):
-                    W.append(tf.Variable(tf.random_normal([1, self.num_factor], stddev=0.01), name="W"+str(k)))
+                    W.append(tf.Variable(tf.random_normal([1, self.num_factor], stddev=0.01), name='W'+str(k)))
                     layer = tf.nn.tanh(tf.sparse_tensor_dense_matmul(adj_matrix_dropout, layer) * W[k])
                     layer = tf.nn.dropout(layer, keep_prob=1-self.emb_dropout_rate)
                     embedding_final += [layer]
@@ -59,8 +59,8 @@ class CIGCN(object):
                 W_1 = []
                 W_2 = []
                 for k in range(self.num_layer):
-                    W_1.append(tf.Variable(tf.random_normal([self.num_factor, self.num_factor], stddev=0.01), name="W_1"+str(k)))
-                    W_2.append(tf.Variable(tf.random_normal([self.num_factor, self.num_factor], stddev=0.01), name="W_2"+str(k)))
+                    W_1.append(tf.Variable(tf.random_normal([self.num_factor, self.num_factor], stddev=0.01), name='W_1'+str(k)))
+                    W_2.append(tf.Variable(tf.random_normal([self.num_factor, self.num_factor], stddev=0.01), name='W_2'+str(k)))
                     layer = tf.nn.leaky_relu(tf.matmul(tf.sparse_tensor_dense_matmul(adj_matrix_dropout, layer), W_1[k])
                                              + tf.matmul(layer, W_1[k])
                                              + tf.matmul(tf.sparse_tensor_dense_matmul(adj_matrix_dropout, layer * layer), W_2[k]))
