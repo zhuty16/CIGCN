@@ -89,4 +89,4 @@ if __name__ == '__main__':
         train_data[u] = all_data[u][:-2]
         neg_data[u] = random.sample(list(set(range(num_item)) - set(all_data[u])), 999)
 
-    np.save('{dataset}/{dataset}'.format(dataset=dataset), np.array([train_data, validate_data, test_data, neg_data, num_user, num_item]))
+    np.save('data/{dataset}/{dataset}'.format(dataset=dataset), np.array([train_data, validate_data, test_data, neg_data, num_user, num_item]))
