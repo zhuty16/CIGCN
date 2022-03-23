@@ -26,6 +26,9 @@ The code has been tested running under Python 3.6. The required packages are as 
 * numpy == 1.14.2
 * scipy == 1.1.0
 
+## Dataset
+* Download: [Google Drive](https://drive.google.com/drive/folders/1rcQOcl6K4q_n8584IDZ3qO5E6tjudEnG?usp=sharing)
+
 ## Example to Run the Codes
 * Amazon Automotive dataset
 ```
